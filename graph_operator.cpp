@@ -11,8 +11,17 @@
 #include <iterator>
 using namespace std;
 
-bool is_integer(string str) //Test if a given string is an integer
-{
+//All Variables
+int e = 0;
+bool weighted = false, max_mode = false;
+map <string, set <string>> mst_graph, all_graph;
+map <pair <string, string>, int> all_weights;
+deque <pair <string, string>> all_edges, mst_edges;
+set <string> all_vertices, mst_vertices;
+int path_ans = 0;
+deque <deque <string>> paths_count;
+
+bool is_integer(string str) {
     if (str.empty()) return false;
     while (str.front() == ' ') {
         str = str.substr(1);
@@ -29,17 +38,6 @@ bool is_integer(string str) //Test if a given string is an integer
     }
     return true;
 }
-
-int e = 0;
-bool weighted = false, max_mode = false;
-map <string, set <string>> mst_graph, all_graph;
-map <pair <string, string>, int> all_weights;
-deque <pair <string, string>> all_edges, mst_edges;
-set <string> all_vertices, mst_vertices;
-int path_ans = 0;
-deque <deque <string>> paths_count;
-
-
 bool comp(pair <string, string> a, pair <string, string> b) {
     return (all_weights[make_pair(a.first, a.second)] < all_weights[make_pair(b.first, b.second)]);
 }
@@ -55,7 +53,6 @@ void clear_all() {
     mst_vertices.clear();
     paths_count.clear();
 }
-
 
 //Graph Display:
 void graph_display() {
@@ -73,7 +70,6 @@ void graph_display() {
         cout << '\n';
     }
 }
-
 
 //Input Menu:
 void graph_input() {
@@ -298,9 +294,9 @@ void add_edge_input() {
         }
         else { break; }
     }
-    cout << "\nNew edge added between nodes { " << pending_add.first << ' ' << pending_add.second;
+    cout << "\nNew edge added between nodes { " << pending_add.first << ' ' << pending_add.second << " } ";
     if (weighted == true) {
-        cout << " } of weight " << all_weights[make_pair(pending_add.first, pending_add.second)] << '\n';
+        cout << "of weight " << all_weights[make_pair(pending_add.first, pending_add.second)] << '\n';
     }
     bool firstdisplay = false;
     if (all_vertices.find(pending_add.first) == all_vertices.end()) {
@@ -385,9 +381,9 @@ void remove_edge_input() {
         }
         else { break; }
     }
-    cout << "\nRemoved edge between nodes { " << pending_remove.first << ' ' << pending_remove.second;
+    cout << "\nRemoved edge between nodes { " << pending_remove.first << ' ' << pending_remove.second << " } ";
     if (weighted == true) {
-        cout << " } of weight " << all_weights[make_pair(pending_remove.first, pending_remove.second)] << '\n';
+        cout << "of weight " << all_weights[make_pair(pending_remove.first, pending_remove.second)] << '\n';
         all_weights.erase(make_pair(pending_remove.first, pending_remove.second));
         all_weights.erase(make_pair(pending_remove.second, pending_remove.first));
     }
@@ -472,10 +468,8 @@ void reweight_edge_input() {
         }
         else { break; }
     }
-    cout << "\nNew update to edge between nodes { " << pending_change.first << ' ' << pending_change.second;
-    if (weighted == true) {
-        cout << " } for new weight " << all_weights[make_pair(pending_change.first, pending_change.second)] << '\n';
-    }
+    cout << "\nNew update to edge between nodes { " << pending_change.first << ' ' << pending_change.second << " } ";
+    cout << "for new weight " << all_weights[make_pair(pending_change.first, pending_change.second)] << '\n';
     cout << '\n';
 }
 void clear_weights_input() {
@@ -483,6 +477,7 @@ void clear_weights_input() {
     weighted = false;
 }
 void add_weights_input() {
+    weighted = true;
     string temp;
     for (pair <string, string> x : all_edges) {
         while (true) {
@@ -505,10 +500,8 @@ void add_weights_input() {
     cout << "\nAll new weights updated!\n";
 }
 
-
 //MST Menu:
-bool detect_component_cycle_kruskal(string node, string parent, map <string, bool> vis)
-{
+bool detect_component_cycle_kruskal(string node, string parent, map <string, bool> vis) {
     vis[node] = 1;
     for (string neighbor : mst_graph[node]) {
         if (parent == neighbor) { continue; }
@@ -517,8 +510,7 @@ bool detect_component_cycle_kruskal(string node, string parent, map <string, boo
     }
     return false;
 }
-bool detect_graph_cycle_kruskal()
-{
+bool detect_graph_cycle_kruskal() {
     map <string, bool> vis;
     for (string str : all_vertices) { vis[str] = false; }
     for (string str : all_vertices) {
@@ -528,18 +520,15 @@ bool detect_graph_cycle_kruskal()
     }
     return false;
 }
-void add_edge_kruskal(int index)
-{
+void add_edge_kruskal(int index) {
     mst_graph[all_edges[index].first].insert(all_edges[index].second);
     mst_graph[all_edges[index].second].insert(all_edges[index].first);
 }
-void remove_edge_kruskal(int index)
-{
+void remove_edge_kruskal(int index) {
     mst_graph[all_edges[index].first].erase(all_edges[index].second);
     mst_graph[all_edges[index].second].erase(all_edges[index].first);
 }
-void perform_kruskal()
-{
+void perform_kruskal() {
     int edge_index = 0;
     while (mst_vertices.size() != all_vertices.size()) {
         add_edge_kruskal(edge_index);
@@ -569,8 +558,7 @@ void perform_kruskal()
         ++edge_index;
     }
 }
-void main_kruskal()
-{
+void main_kruskal() {
     cout << "\nPerforming Kruskal Algorithm:\n";
     if (max_mode) { sort(all_edges.begin(), all_edges.end(), comp_max); }
     else { sort(all_edges.begin(), all_edges.end(), comp); }
@@ -593,9 +581,7 @@ void main_kruskal()
     else { cout << "Minimum"; }
     cout << " Spanning Tree Weight: " << all_weight_kruskal << "\n\n\n";
 }
-
-void add_edge_prim(pair <string, string> new_edge)
-{
+void add_edge_prim(pair <string, string> new_edge) {
     mst_vertices.insert(new_edge.first), mst_vertices.insert(new_edge.second);
     mst_edges.push_back(new_edge);
     cout << "\nNew edge added between nodes { " << new_edge.first << ' ' << new_edge.second << " } of weight " << all_weights[make_pair(new_edge.first, new_edge.second)] << '\n';
@@ -608,8 +594,7 @@ void add_edge_prim(pair <string, string> new_edge)
         cout << "along with new node " << new_edge.second << '\n';
     }
 }
-void perform_prim()
-{
+void perform_prim() {
     while (!all_vertices.empty()) {
         pair <string, string> to_add;
         deque <pair <string, string>> valid_edges;
@@ -626,8 +611,7 @@ void perform_prim()
         add_edge_prim(valid_edges[0]);
     }
 }
-void main_prim()
-{
+void main_prim() {
     cout << "\nPerforming Prim Algorithm:\n";
     string temp;
     while (true) {
@@ -667,7 +651,6 @@ void main_prim()
     }
     cout << "\nAggregate Minimum Spanning Tree Weight: " << all_weight_prim << "\n\n\n";
 }
-
 
 //Compute and Counting Menu
 void dfs_count_paths(string node, string dest, map <string, bool> visited, deque <string> current_path) {
@@ -803,9 +786,8 @@ void main_count_root_depth() {
             cout << x << ' ';
         }
     }
-    cout << "\nCount of all vertices of depth " << target << "from root " << root << ": " << count_depth << '\n';
+    cout << "\nCount of all vertices of depth " << target << " from root " << root << ": " << count_depth << '\n';
 }
-
 
 //Shortest Path Menu
 void main_dijkstra() {
@@ -829,7 +811,7 @@ void main_dijkstra() {
         dist[x] = INF;
         parent[x] = "";
     }
-    dist[start] = 0;
+    dist[start] = 0, parent[start] = "";
     priority_queue<pair <int, string>, vector<pair <int, string>>, greater<pair <int, string>>> pq;
     pq.push({0, start});
     cout << "\nStarting Dijkstra from " << start << ".\n";
@@ -852,16 +834,18 @@ void main_dijkstra() {
     cout << "\nList of Shortest Path Weights from Source " << start << ":\n";
     for (string x : all_vertices) {
         if (dist[x] == INF) { cout << "Node " << x << " is not connected to source " << start << '\n'; }
-        if (weighted) { cout << "Shortest Path { " << start << ' ' << x << " } has weight: " << dist[x] << '\n'; }
-        else { cout << "Shortest Path { " << start << ' ' << x << " } has length: " << dist[x] << "\n  "; }
-        deque <string> path;
-        string cur = parent.at(cur);
+        if (weighted) { cout << "Shortest Path from " << start << " to " << x << ": weight: " << dist[x] << '\n'; }
+        else { cout << "Shortest Path from " << start << " to " << x << ": length: " << dist[x] << "\n  "; }
+        deque <string> path = {x};
+        string cur = parent.at(x);
         while (!cur.empty()) {
             path.push_back(cur);
             cur = parent.at(cur);
         }
         reverse(path.begin(), path.end());
-        for (string y : path) { cout << y << " -> "; }
+        for (int i = 0; i < path.size() - 1; ++i) {
+            cout << path[i] << " -(" << all_weights[make_pair(path[i], path[i + 1])] << ")-> ";
+        }
         cout << x << '\n';
     }
     if (!weighted) { all_weights.clear(); }
@@ -885,21 +869,25 @@ void main_bellman_ford() {
     map <string, int> dist;
     map <string, string> parent;
     for (string x : all_vertices) { dist[x] = INF; }
-    dist[start] = 0;
+    dist[start] = 0, parent[start] = "";
     cout << "Starting Bellman-Ford from " << start << "\n";
     for (int i = 1; i < all_vertices.size(); ++i) {
         cout << "Iteration " << i << ":\n";
         for (pair <string, string> x : all_edges) {
             int w = all_weights[x];
             if (dist[x.first] != INF && dist[x.first] + w < dist[x.second]) {
-                cout << "  Relaxing edge " << dist[x.first] << " -> " << dist[x.second] << " with "; 
+                cout << "  Relaxing edge " << x.first << " -> " << x.second << " with "; 
                 if (weighted)
-                cout << " weight " << w << ".\n";
-                cout << "Updating " << dist[x.second] << " from " << (dist[x.second] == INF? -1 : dist[x.second]) << " to " << dist[x.first] + all_weights[x] << ".\n";
+                cout << "weight " << w << ".\n";
+                cout << "Updating distance to " << x.second << " from ";
+                if (dist[x.second] == INF) { cout << "Unvisited"; }
+                else { cout << dist[x.second]; }
+                cout << " to " << dist[x.first] + all_weights[x] << ".\n";
                 dist[x.second] = dist[x.first] + w;
                 parent[x.second] = x.first;
             }
         }
+        cout << "Iteration " << i << " finished.\n";
     }
     bool neg_cy = false;
     for (pair <string, string> x : all_edges) {
@@ -914,16 +902,18 @@ void main_bellman_ford() {
         cout << "\nList of Shortest Path Weights from Source " << start << ":\n";
         for (string x : all_vertices) {
             if (dist[x] == INF) { cout << "Node " << x << " is not connected to source " << start << '\n'; }
-            if (weighted) { cout << "Shortest Path { " << start << ' ' << x << " } has weight: " << dist[x] << '\n'; }
-            else { cout << "Shortest Path { " << start << ' ' << x << " } has length: " << dist[x] << '\n'; }
-            deque <string> path;
-            string cur = parent.at(cur);
+            if (weighted) { cout << "Shortest Path from " << start << " to " << x << ": weight: " << dist[x] << '\n'; }
+            else { cout << "Shortest Path from " << start << " to " << x << ": length: " << dist[x] << "\n  "; }
+            deque <string> path = {x};
+            string cur = parent.at(x);
             while (!cur.empty()) {
                 path.push_back(cur);
                 cur = parent.at(cur);
             }
             reverse(path.begin(), path.end());
-            for (string y : path) { cout << y << " -> "; }
+            for (int i = 0; i < path.size() - 1; ++i) {
+                cout << path[i] << " -(" << all_weights[make_pair(path[i], path[i + 1])] << ")-> ";
+            }
             cout << x << '\n';
         }
     }
@@ -976,8 +966,8 @@ void main_floyd_warshall() {
     cout << "\nList of Shortest Path Weights from Source " << start << ":\n";
     for (string x : all_vertices) {
         if (dist[make_pair(start, x)] == INF) { cout << "Node " << x << " is not connected to source " << start << '\n'; }
-        if (weighted) { cout << "Shortest Path { " << start << ' ' << x << " } has weight: " << dist[make_pair(start, x)] << '\n'; }
-        else { cout << "Shortest Path { " << start << ' ' << x << " } has length: " << dist[make_pair(start, x)] << "\n  "; }
+        if (weighted) { cout << "Shortest Path from " << start << " to " << x << ": weight: " << dist[make_pair(start, x)] << '\n'; }
+        else { cout << "Shortest Path from " << start << " to " << x << ": length: " << dist[make_pair(start, x)] << "\n  "; }
         if (!next.at(make_pair(start, x)).empty()) {
             cout << start;
             string cur = start;
@@ -991,7 +981,6 @@ void main_floyd_warshall() {
     if (!weighted) { all_weights.clear(); }
     cout << "Floyd-Warshall finished.\n";
 }
-
 
 //Main Driver Function
 int main() {
@@ -1046,11 +1035,11 @@ int main() {
                 cout << "\n The current graph is weighted and valid.\n";
                 while (true) {
                     cout << "\n Select algorithm from list below:\n";
-                    cout << "   Enter k to compute the current graph's ";
+                    cout << "   Enter k to compute the ";
                     if (max_mode) { cout << "Maximum"; }
                     else { cout << "Minimum"; }
                     cout << " Spanning Tree (MST) using Kruskal's Algorithm\n";
-                    cout << "   Enter p to compute the current graph's ";
+                    cout << "   Enter p to compute the ";
                     if (max_mode) { cout << "Maximum"; }
                     else { cout << "Minimum"; }
                     cout << " Spanning Tree (MST) using Prim's Algorithm\n";
@@ -1075,10 +1064,10 @@ int main() {
                 cout << "\n Select function from list below:\n";
                 cout << "   Enter o to compute the current graph's order (vertex count)\n";
                 cout << "   Enter s to compute the current graph's size (edge count)\n";
-                cout << "   Enter p to count the paths between two nodes in the current graph\n";
-                cout << "   Enter n to compute the neighbors of a given node in the current graph (degree)\n";
+                cout << "   Enter p to count the paths between two nodes\n";
+                cout << "   Enter n to compute the neighbors of a given node (degree)\n";
                 cout << "   Enter d to compute nodes with a given degree in the current graph\n";
-                cout << "   Enter r to compute all nodes of a given depth from a given root in the current graph\n";
+                cout << "   Enter r to compute all nodes of a given depth from a given root\n";
                 cout << "   Enter e to exit back to the main menu\n";
                 char func_pressed = cin.get();
                 cin.ignore(2147483647, '\n');
@@ -1099,9 +1088,9 @@ int main() {
             cout << "\n The current graph is weighted and valid.\n";
             while (true) {
                 cout << "\n Select algorithm from list below:\n";
-                cout << "   Enter f to compute shortest paths using Floyd-Warshall's Algorithm from a source to the graph:\n";
-                cout << "   Enter d to compute shortest paths using Dijkstra's Algorithm from a source to the graph:\n";
-                cout << "   Enter b to compute shortest paths using Bellman-Ford's Algorithm from a source to the graph:\n";
+                cout << "   Enter f to compute shortest paths using Floyd-Warshall's Algorithm:\n";
+                cout << "   Enter d to compute shortest paths using Dijkstra's Algorithm:\n";
+                cout << "   Enter b to compute shortest paths using Bellman-Ford's Algorithm:\n";
                 cout << "   Enter e to exit back to the main menu\n";
                 char algo_pressed = cin.get();
                 cin.ignore(2147483647, '\n');
@@ -1124,24 +1113,24 @@ int main() {
             cout << "   Menu i operation r: re-weight an edge\n";
             cout << "   Menu i operation c: clear weights from the current graph\n";
             cout << "   Menu i operation w: add weights to the current graph\n";
-            cout << "   Menu m operation k: compute the current graph's ";
+            cout << "   Menu m operation k: compute the ";
             if (max_mode) { cout << "Maximum"; }
             else { cout << "Minimum"; }
             cout << " Spanning Tree (MST) using Kruskal's Algorithm\n";
-            cout << "   Menu m operation p: compute the current graph's ";
+            cout << "   Menu m operation p: compute the ";
             if (max_mode) { cout << "Maximum"; }
             else { cout << "Minimum"; }
             cout << " Spanning Tree (MST) using Prim's Algorithm\n";
             cout << "   Menu m operation m: change between Minimum and Maximum Spanning Tree modes\n";
             cout << "   Menu c operation o: compute the current graph's order (vertex count)\n";
             cout << "   Menu c operation s: compute the current graph's size (edge count)\n";
-            cout << "   Menu c operation p: count the paths between two given nodes in the current graph\n";
-            cout << "   Menu c operation n: compute the neighbors of a given node in the current graph (degree)\n";
+            cout << "   Menu c operation p: count the paths between two given nodes\n";
+            cout << "   Menu c operation n: compute the neighbors of a given node (degree)\n";
             cout << "   Menu c operation d: compute nodes with a given degree in the current graph\n";
-            cout << "   Menu c operation r: compute all nodes of a given depth from a given root in the current graph\n";
-            cout << "   Menu s operation f: compute shortest paths using Floyd-Warshall's Algorithm from a source to the graph:\n";
-            cout << "   Menu s operation d: compute shortest paths using Dijkstra's Algorithm from a source to the graph:\n";
-            cout << "   Menu s operation b: compute shortest paths using Bellman-Ford's Algorithm from a source to the graph:\n";
+            cout << "   Menu c operation r: compute all nodes of a given depth from a given root\n";
+            cout << "   Menu s operation f: compute shortest paths using Floyd-Warshall's Algorithm\n";
+            cout << "   Menu s operation d: compute shortest paths using Dijkstra's Algorithm\n";
+            cout << "   Menu s operation b: compute shortest paths using Bellman-Ford's Algorithm\n";
         }
         else if (key_pressed == 'e') { return 0; }
         else { cout << "\n\"" << key_pressed << "\" is an invalid key enter! Attempt aborted.\n"; }

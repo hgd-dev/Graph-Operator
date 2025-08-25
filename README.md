@@ -61,8 +61,8 @@ Graph-Operator/
 **Build:**
 
 ```bash
-git clone https://github.com/hgd-dev/MST-Builder.git
-cd MST-Builder
+git clone https://github.com/hgd-dev/Graph-Operator.git
+cd Graph-Operator
 
 mkdir build && cd build
 cmake ..
@@ -93,4 +93,5 @@ g++ -std=c++17 graph_operator.cpp -o GraphOperator.exe
 ./GraphOperator   # or NewtonPolygonizer.exe on Windows
 
 ```
+
 

@@ -1,0 +1,67 @@
+name: Build and Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'   # Only runs on version tags like v1.0.0
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+#      - name: Setup CMake
+#        uses: jwlawson/actions-setup-cmake@v2
+
+      - name: Create build directory
+        run: mkdir -p build
+
+      - name: Build executable
+        run: |
+          cd build
+          cmake .. -DCMAKE_BUILD_TYPE=Release
+          cmake --build . --config Release
+
+      - name: Package Linux
+        if: runner.os == 'Linux'
+        run: |
+          cd build
+          tar -czf Graph-Operator-Linux.tar.gz GraphOperator
+      - name: Package macOS
+        if: runner.os == 'macOS'
+        run: |
+          cd build
+          zip -r Graph-Operator-macOS.zip GraphOperator
+      - name: Package Windows
+        if: runner.os == 'Windows'
+        run: |
+          cd build
+          Compress-Archive -Path Release/GraphOperator.exe -DestinationPath Graph-Operator-Windows.zip     
+
+      - name: Upload Linux artifact
+        if: matrix.os == 'ubuntu-latest'
+        uses: actions/upload-artifact@v4
+        with:
+          name: Graph-Operator-Linux
+          path: build/Graph-Operator-Linux.tar.gz
+      
+      - name: Upload macOS artifact
+        if: matrix.os == 'macos-latest'
+        uses: actions/upload-artifact@v4
+        with:
+          name: Graph-Operator-macOS
+          path: build/Graph-Operator-macOS.zip
+      
+      - name: Upload Windows artifact
+        if: matrix.os == 'windows-latest'
+        uses: actions/upload-artifact@v4
+        with:
+          name: Graph-Operator-Windows
+          path: build/Graph-Operator-Windows.zip

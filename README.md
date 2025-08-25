@@ -10,9 +10,9 @@ For casual users, this only downloads an executable app for easy access, suited 
 
 ***Important Note:*** For some systems with auto-protection or malware scanners, the executable may be flagged as unknown. For users to continue, simply bypass (ex. clicking "Run Anyway"). The source code is all in this repository and I assure all that this project has no harmful intentions.
 
-[![Windows](https://img.shields.io/badge/Download-Windows-blue?style=for-the-badge&logo=windows)]()
-[![macOS](https://img.shields.io/badge/Download-macOS-lightgrey?style=for-the-badge&logo=apple)]()
-[![Linux](https://img.shields.io/badge/Download-Linux-yellow?style=for-the-badge&logo=linux)]()
+[![Windows](https://img.shields.io/badge/Download-Windows-blue?style=for-the-badge&logo=windows)](https://github.com/hgd-dev/Graph-Operator/actions/runs/17209811666/artifacts/3843617055)
+[![macOS](https://img.shields.io/badge/Download-macOS-lightgrey?style=for-the-badge&logo=apple)](https://github.com/hgd-dev/Graph-Operator/actions/runs/17209811666/artifacts/3843611393)
+[![Linux](https://img.shields.io/badge/Download-Linux-yellow?style=for-the-badge&logo=linux)](https://github.com/hgd-dev/Graph-Operator/actions/runs/17209811666/artifacts/3843611671)
 
 ***Caveat for all runs:***This project has automatic input fail-safe detectors to ensure smooth running and correct input of data. While it is built-in to catch typos or mistaken keystrokes, please refrain from deliberately attempting to break the program or use corrupted data. Undefined behavior can have unintended consequences.
 
@@ -91,4 +91,5 @@ g++ -std=c++17 graph_operator.cpp -o GraphOperator.exe
 
 ```bash
 ./GraphOperator   # or NewtonPolygonizer.exe on Windows
+
 ```

@@ -23,34 +23,22 @@ deque <deque <string>> paths_count;
 
 bool is_integer(string str) {
     if (str.empty()) return false;
-    while (str.front() == ' ') {
-        str = str.substr(1);
-    }
+    while (str.front() == ' ') { str = str.substr(1); }
     size_t start = 0;
     if (str[0] == '-' || str[0] == '+') {
-        if (str.size() == 1) return false;
+        if (str.size() == 1) { return false; }
         start = 1;
     }
-    for (size_t i = start; i < str.size(); ++i) {
-        if (!std::isdigit(str[i])) {
-            return false;
-        }
-    }
+    for (size_t i = start; i < str.size(); ++i) { if (!isdigit(str[i])) { return false; } }
     return true;
 }
-bool comp(pair <string, string> a, pair <string, string> b) {
-    return (all_weights[make_pair(a.first, a.second)] < all_weights[make_pair(b.first, b.second)]);
-}
-bool comp_max(pair <string, string> a, pair <string, string> b) {
-    return (all_weights[make_pair(a.first, a.second)] > all_weights[make_pair(b.first, b.second)]);
-}
+bool comp(pair <string, string> a, pair <string, string> b) { return (all_weights[make_pair(a.first, a.second)] < all_weights[make_pair(b.first, b.second)]); }
+bool comp_max(pair <string, string> a, pair <string, string> b) { return (all_weights[make_pair(a.first, a.second)] > all_weights[make_pair(b.first, b.second)]); }
 void clear_all() {
     e = 0, path_ans = 0;
-    mst_graph.clear();
-    all_edges.clear();
-    mst_edges.clear();
-    all_vertices.clear();
-    mst_vertices.clear();
+    all_graph.clear(), mst_graph.clear();
+    all_edges.clear(), mst_edges.clear();
+    all_vertices.clear(), mst_vertices.clear();
     paths_count.clear();
 }
 
@@ -59,9 +47,7 @@ void graph_display() {
     cout << "\nDisplay of the current graph:\n\n";
     cout << "List of all vertices:\n  ";
     for (string x : all_vertices) { cout << x << ' '; }
-    cout << '\n';
-
-    cout << "\nList of all edges ";
+    cout << "\n\nList of all edges ";
     if (weighted) { cout << "with weights:"; }
     cout << '\n';
     for (pair <string, string> x : all_edges) {
@@ -78,23 +64,14 @@ void graph_input() {
     while (true) {
         cout << "Enter 1 if the graph is weighted and 0 if not:\n";
         getline(cin, temp);
-        if (temp == "1") {
-            weighted = true;
-            break;
-        }
-        else if (temp == "0") {
-            weighted = false;
-            break;
-        }
+        if (temp == "1") { weighted = true; break; }
+        else if (temp == "0") { weighted = false; break; }
         else { cout << "Invalid graph! Attempt aborted.\n\n"; }
     }
     while (true) {
         cout << "Enter your graph's number of edges (ε(G)):\n";
         getline(cin, temp);
-        if (is_integer(temp) && stoi(temp) > 0) {
-            e = stoi(temp);
-            break;
-        }
+        if (is_integer(temp) && stoi(temp) > 0) { e = stoi(temp); break; }
         else { cout << "Invalid size! Attempt aborted.\n\n"; }
     }
     all_edges.resize(e);
@@ -107,51 +84,27 @@ void graph_input() {
             getline(cin, temp);
             temp = temp + ' ';
             istringstream iss(temp);
-
-
             string token = "";
             while (token.empty()) {
                 if (getline(iss, token, ' ')) {}
-                else {
-                    inputValid = false;
-                    break;
-                }
+                else { inputValid = false; break; }
             }
-            if (!inputValid) {
-                cout << "Invalid edge! Attempt aborted.\n\n";
-                continue;
-            }
+            if (!inputValid) { cout << "Invalid edge! Attempt aborted.\n\n"; continue; }
             else { all_edges[i].first = token; }
-
-
             token = "";
             while (token.empty()) {
                 if (getline(iss, token, ' ')) {}
-                else {
-                    inputValid = false;
-                    break;
-                }
+                else { inputValid = false; break; }
             }
-            if (!inputValid) {
-                cout << "Invalid edge! Attempt aborted.\n\n";
-                continue;
-            }
+            if (!inputValid) { cout << "Invalid edge! Attempt aborted.\n\n"; continue; }
             else { all_edges[i].second = token; }
-
-
             if (weighted) {
                 token = "";
                 while (token.empty()) {
                     if (getline(iss, token, ' ')) {}
-                    else {
-                        inputValid = false;
-                        break;
-                    }
+                    else { inputValid = false; break; }
                 }
-                if (!inputValid) {
-                    cout << "Invalid edge! Attempt aborted.\n\n";
-                    continue;
-                }
+                if (!inputValid) { cout << "Invalid edge! Attempt aborted.\n\n"; continue; }
                 else {
                     if (is_integer(token)) {
                         all_weights[make_pair(all_edges[i].first, all_edges[i].second)] = (stoi(token));
@@ -162,10 +115,7 @@ void graph_input() {
             }
 
 
-            if (!inputValid) {
-                cout << "Invalid edge! Attempt aborted.\n\n";
-                continue;
-            }
+            if (!inputValid) { cout << "Invalid edge! Attempt aborted.\n\n"; continue; }
             else { break; }
         }
     }
@@ -184,9 +134,7 @@ void rename_node_input() {
             string new_name;
             getline(cin, new_name);
             all_vertices.erase(temp), all_vertices.insert(new_name);
-            if (weighted && !mst_vertices.empty()) {
-                mst_vertices.erase(temp), mst_vertices.insert(new_name);
-            }
+            if (weighted && !mst_vertices.empty()) { mst_vertices.erase(temp), mst_vertices.insert(new_name); }
             all_graph[new_name] = all_graph[temp];
             all_graph.erase(temp);
             if (weighted && !mst_vertices.empty()) {
@@ -237,48 +185,27 @@ void add_edge_input() {
         getline(cin, temp);
         temp = temp + ' ';
         istringstream iss(temp);
-
         string token = "";
         while (token.empty()) {
             if (getline(iss, token, ' ')) {}
-            else {
-                inputValid = false;
-                break;
-            }
+            else { inputValid = false; break; }
         }
-        if (!inputValid) {
-            cout << "Invalid edge! Attempt aborted.\n\n";
-            continue;
-        }
+        if (!inputValid) { cout << "Invalid edge! Attempt aborted.\n\n"; continue; }
         else { pending_add.first = token; }
-
         token = "";
         while (token.empty()) {
             if (getline(iss, token, ' ')) {}
-            else {
-                inputValid = false;
-                break;
-            }
+            else { inputValid = false; break; }
         }
-        if (!inputValid) {
-            cout << "Invalid edge! Attempt aborted.\n\n";
-            continue;
-        }
+        if (!inputValid) { cout << "Invalid edge! Attempt aborted.\n\n"; continue; }
         else { pending_add.second = token; }
-
         if (weighted) {
             token = "";
             while (token.empty()) {
                 if (getline(iss, token, ' ')) {}
-                else {
-                    inputValid = false;
-                    break;
-                }
+                else { inputValid = false;  break; }
             }
-            if (!inputValid) {
-                cout << "Invalid edge! Attempt aborted.\n\n";
-                continue;
-            }
+            if (!inputValid) { cout << "Invalid edge! Attempt aborted.\n\n"; continue; }
             else {
                 if (is_integer(token)) {
                     all_weights[make_pair(pending_add.first, pending_add.second)] = (stoi(token));
@@ -288,16 +215,11 @@ void add_edge_input() {
             }
         }
 
-        if (!inputValid) {
-            cout << "Invalid edge! Attempt aborted.\n\n";
-            continue;
-        }
+        if (!inputValid) {  cout << "Invalid edge! Attempt aborted.\n\n"; continue; }
         else { break; }
     }
     cout << "\nNew edge added between nodes { " << pending_add.first << ' ' << pending_add.second << " } ";
-    if (weighted == true) {
-        cout << "of weight " << all_weights[make_pair(pending_add.first, pending_add.second)] << '\n';
-    }
+    if (weighted == true) { cout << "of weight " << all_weights[make_pair(pending_add.first, pending_add.second)] << '\n'; }
     bool firstdisplay = false;
     if (all_vertices.find(pending_add.first) == all_vertices.end()) {
         all_vertices.insert(pending_add.first);
@@ -306,12 +228,8 @@ void add_edge_input() {
     }
     if (all_vertices.find(pending_add.second) == all_vertices.end()) {
         all_vertices.insert(pending_add.second);
-        if (firstdisplay) {
-            cout << " and new node " << pending_add.second;
-        }
-        else {
-            cout << "along with new node " << pending_add.second;
-        }
+        if (firstdisplay) { cout << " and new node " << pending_add.second; }
+        else { cout << "along with new node " << pending_add.second; }
     }
     cout << '\n';
     all_graph[pending_add.first].insert(pending_add.second), all_graph[pending_add.second].insert(pending_add.first);
@@ -326,59 +244,29 @@ void remove_edge_input() {
         getline(cin, temp);
         temp = temp + ' ';
         istringstream iss(temp);
-
-
         string token = "";
         while (token.empty()) {
             if (getline(iss, token, ' ')) {}
-            else {
-                inputValid = false;
-                break;
-            }
+            else { inputValid = false; break; }
         }
-        if (!inputValid) {
-            cout << "Invalid edge! Attempt aborted.\n\n";
-            continue;
-        }
+        if (!inputValid) { cout << "Invalid edge! Attempt aborted.\n\n"; continue; }
         else {
-            if (all_vertices.find(token) == all_vertices.end()) {
-                cout << "Invalid edge! Attempt aborted.\n\n";
-                continue;
-            }
+            if (all_vertices.find(token) == all_vertices.end()) { cout << "Invalid edge! Attempt aborted.\n\n"; continue; }
             pending_remove.first = token;
         }
-
-
         token = "";
         while (token.empty()) {
             if (getline(iss, token, ' ')) {}
-            else {
-                inputValid = false;
-                break;
-            }
+            else { inputValid = false; break; }
         }
-        if (!inputValid) {
-            cout << "Invalid edge! Attempt aborted.\n\n";
-            continue;
-        }
+        if (!inputValid) { cout << "Invalid edge! Attempt aborted.\n\n"; continue; }
         else {
-            if (all_vertices.find(token) == all_vertices.end()) {
-                cout << "Invalid edge! Attempt aborted.\n\n";
-                continue;
-            }
+            if (all_vertices.find(token) == all_vertices.end()) { cout << "Invalid edge! Attempt aborted.\n\n"; continue; }
             pending_remove.second = token;
         }
         bool is_edge = false;
-        for (pair <string, string> x : all_edges) {
-            if (x == pending_remove || make_pair(x.second, x.first) == pending_remove) {
-                is_edge = true;
-                break;
-            }
-        }
-        if (!is_edge) {
-            cout << "Invalid edge! Attempt aborted.\n\n";
-            continue;
-        }
+        for (pair <string, string> x : all_edges) { if (x == pending_remove || make_pair(x.second, x.first) == pending_remove) { is_edge = true; break; } }
+        if (!is_edge) { cout << "Invalid edge! Attempt aborted.\n\n"; continue; }
         else { break; }
     }
     cout << "\nRemoved edge between nodes { " << pending_remove.first << ' ' << pending_remove.second << " } ";
@@ -401,59 +289,32 @@ void reweight_edge_input() {
         getline(cin, temp);
         temp = temp + ' ';
         istringstream iss(temp);
-
         string token = "";
         while (token.empty()) {
             if (getline(iss, token, ' ')) {}
-            else {
-                inputValid = false;
-                break;
-            }
+            else { inputValid = false; break; }
         }
-        if (!inputValid) {
-            cout << "Invalid edge! Attempt aborted.\n\n";
-            continue;
-        }
+        if (!inputValid) { cout << "Invalid edge! Attempt aborted.\n\n"; continue; }
         else {
-            if (all_vertices.find(token) == all_vertices.end()) {
-                cout << "Invalid edge! Attempt aborted.\n\n";
-                continue;
-            }
+            if (all_vertices.find(token) == all_vertices.end()) { cout << "Invalid edge! Attempt aborted.\n\n"; continue; }
             pending_change.first = token;
         }
-
         token = "";
         while (token.empty()) {
             if (getline(iss, token, ' ')) {}
-            else {
-                inputValid = false;
-                break;
-            }
+            else { inputValid = false; break; }
         }
-        if (!inputValid) {
-            cout << "Invalid edge! Attempt aborted.\n\n";
-            continue;
-        }
+        if (!inputValid) { cout << "Invalid edge! Attempt aborted.\n\n"; continue; }
         else {
-            if (all_vertices.find(token) == all_vertices.end()) {
-                cout << "Invalid edge! Attempt aborted.\n\n";
-                continue;
-            }
+            if (all_vertices.find(token) == all_vertices.end()) { cout << "Invalid edge! Attempt aborted.\n\n"; continue; }
             pending_change.second = token;
         }
-
         token = "";
         while (token.empty()) {
             if (getline(iss, token, ' ')) {}
-            else {
-                inputValid = false;
-                break;
-            }
+            else { inputValid = false; break; }
         }
-        if (!inputValid) {
-            cout << "Invalid edge! Attempt aborted.\n\n";
-            continue;
-        }
+        if (!inputValid) { cout << "Invalid edge! Attempt aborted.\n\n"; continue; }
         else {
             if (is_integer(token)) {
                 all_weights[make_pair(pending_change.first, pending_change.second)] = (stoi(token));
@@ -461,21 +322,14 @@ void reweight_edge_input() {
             }
             else { inputValid = false; }
         }
-
-        if (!inputValid) {
-            cout << "Invalid edge! Attempt aborted.\n\n";
-            continue;
-        }
+        if (!inputValid) { cout << "Invalid edge! Attempt aborted.\n\n"; continue; }
         else { break; }
     }
     cout << "\nNew update to edge between nodes { " << pending_change.first << ' ' << pending_change.second << " } ";
     cout << "for new weight " << all_weights[make_pair(pending_change.first, pending_change.second)] << '\n';
     cout << '\n';
 }
-void clear_weights_input() {
-    all_weights.clear();
-    weighted = false;
-}
+void clear_weights_input() { all_weights.clear(), weighted = false; }
 void add_weights_input() {
     weighted = true;
     string temp;
@@ -491,10 +345,7 @@ void add_weights_input() {
                 all_weights[make_pair(x.second, x.first)] = (stoi(temp));
                 break;
             }
-            else {
-                cout << "Invalid weight! Attempt aborted.\n\n";
-                continue;
-            }
+            else { cout << "Invalid weight! Attempt aborted.\n\n"; continue; }
         }
     }
     cout << "\nAll new weights updated!\n";
@@ -513,28 +364,16 @@ bool detect_component_cycle_kruskal(string node, string parent, map <string, boo
 bool detect_graph_cycle_kruskal() {
     map <string, bool> vis;
     for (string str : all_vertices) { vis[str] = false; }
-    for (string str : all_vertices) {
-        if (!vis[str]) {
-            if (detect_component_cycle_kruskal(str, "-1", vis)) { return true; }
-        }
-    }
+    for (string str : all_vertices) { if (!vis[str]) { if (detect_component_cycle_kruskal(str, "-1", vis)) { return true; } } }
     return false;
 }
-void add_edge_kruskal(int index) {
-    mst_graph[all_edges[index].first].insert(all_edges[index].second);
-    mst_graph[all_edges[index].second].insert(all_edges[index].first);
-}
-void remove_edge_kruskal(int index) {
-    mst_graph[all_edges[index].first].erase(all_edges[index].second);
-    mst_graph[all_edges[index].second].erase(all_edges[index].first);
-}
+void add_edge_kruskal(int index) { mst_graph[all_edges[index].first].insert(all_edges[index].second), mst_graph[all_edges[index].second].insert(all_edges[index].first); }
+void remove_edge_kruskal(int index) { mst_graph[all_edges[index].first].erase(all_edges[index].second), mst_graph[all_edges[index].second].erase(all_edges[index].first); }
 void perform_kruskal() {
     int edge_index = 0;
     while (mst_vertices.size() != all_vertices.size()) {
         add_edge_kruskal(edge_index);
-        if (detect_graph_cycle_kruskal()) {
-            remove_edge_kruskal(edge_index);
-        }
+        if (detect_graph_cycle_kruskal()) { remove_edge_kruskal(edge_index); }
         else {
             mst_edges.push_back(all_edges[edge_index]);
             cout << "\nNew edge added between nodes { " << all_edges[edge_index].first << ' ' << all_edges[edge_index].second << " } of weight " << all_weights[make_pair(all_edges[edge_index].first, all_edges[edge_index].second)] << '\n';
@@ -546,12 +385,8 @@ void perform_kruskal() {
             }
             if (mst_vertices.find(all_edges[edge_index].second) == mst_vertices.end()) {
                 mst_vertices.insert(all_edges[edge_index].second);
-                if (firstdisplay) {
-                    cout << " and new node " << all_edges[edge_index].second;
-                }
-                else {
-                    cout << "along with new node " << all_edges[edge_index].second;
-                }
+                if (firstdisplay) { cout << " and new node " << all_edges[edge_index].second; }
+                else { cout << "along with new node " << all_edges[edge_index].second; }
             }
             cout << '\n';
         }
@@ -564,18 +399,12 @@ void main_kruskal() {
     else { sort(all_edges.begin(), all_edges.end(), comp); }
     perform_kruskal();
     cout << "\n\nList of MST vertices:\n";
-    for (string a : all_vertices) {
-        cout << a << ' ';
-    }
+    for (string a : all_vertices) { cout << a << ' '; }
     cout << "\n\nList of MST Edges:\n";
-    for (pair <string, string> b : mst_edges) {
-        cout << "  Nodes: { " << b.first << ' ' << b.second << " }, Weight: " << all_weights[make_pair(b.first, b.second)] << '\n';
-    }
+    for (pair <string, string> b : mst_edges) { cout << "  Nodes: { " << b.first << ' ' << b.second << " }, Weight: " << all_weights[make_pair(b.first, b.second)] << '\n'; }
     cout << "\n\n";
     int all_weight_kruskal = 0;
-    for (pair <string, string> b : mst_edges) {
-        all_weight_kruskal += all_weights[make_pair(b.first, b.second)];
-    }
+    for (pair <string, string> b : mst_edges) { all_weight_kruskal += all_weights[make_pair(b.first, b.second)]; }
     cout << "\nAggregate ";
     if (max_mode) { cout << "Maximum"; }
     else { cout << "Minimum"; }
@@ -628,8 +457,7 @@ void main_prim() {
             set <string>::iterator it = all_vertices.begin();
             advance(it, random_index);
             temp = *it;
-            mst_vertices.insert(temp);
-            all_vertices.erase(temp);
+            mst_vertices.insert(temp), all_vertices.erase(temp);
             cout << "\nStarting MST at vertex " << temp << ":\n";
             break;
         }
@@ -637,18 +465,12 @@ void main_prim() {
     }
     perform_prim();
     cout << "\n\nList of MST Vertices:\n";
-    for (string a : mst_vertices) {
-        cout << a << ' ';
-    }
+    for (string a : mst_vertices) { cout << a << ' '; }
     cout << "\n\nList of MST Edges:\n";
-    for (pair <string, string> b : mst_edges) {
-        cout << "  Nodes: { " << b.first << ' ' << b.second << " }, Weight: " << all_weights[make_pair(b.first, b.second)] << '\n';
-    }
+    for (pair <string, string> b : mst_edges) { cout << "  Nodes: { " << b.first << ' ' << b.second << " }, Weight: " << all_weights[make_pair(b.first, b.second)] << '\n'; }
     cout << "\n\n";
     int all_weight_prim = 0;
-    for (pair <string, string> b : mst_edges) {
-        all_weight_prim += all_weights[make_pair(b.first, b.second)];
-    }
+    for (pair <string, string> b : mst_edges) { all_weight_prim += all_weights[make_pair(b.first, b.second)]; }
     cout << "\nAggregate Minimum Spanning Tree Weight: " << all_weight_prim << "\n\n\n";
 }
 
@@ -661,11 +483,7 @@ void dfs_count_paths(string node, string dest, map <string, bool> visited, deque
     }
     visited[node] = true;
     current_path.push_back(node);
-    for (string neighbor : all_graph[node]) {
-        if (!visited[neighbor]) {
-            dfs_count_paths(neighbor, dest, visited, current_path);
-        }
-    }
+    for (string neighbor : all_graph[node]) { if (!visited[neighbor]) { dfs_count_paths(neighbor, dest, visited, current_path); } }
     visited[node] = false;
 }
 void main_count_paths() {
@@ -673,17 +491,13 @@ void main_count_paths() {
     while (true) {
         cout << "Enter the initial source vertex:\n";
         getline(cin, src);
-        if (all_graph.find(src) != all_graph.end()) {
-            break;
-        }
+        if (all_graph.find(src) != all_graph.end()) { break; }
         else { cout << "Invalid source! Attempt aborted.\n\n"; }
     }
     while (true) {
         cout << "Enter the final destination vertex:\n";
         getline(cin, dest);
-        if (all_graph.find(dest) != all_graph.end()) {
-            break;
-        }
+        if (all_graph.find(dest) != all_graph.end()) { break; }
         else { cout << "Invalid destination! Attempt aborted.\n\n"; }
     }
     cout << "\n\nCounting paths between initial source node " << src << " and final destination node " << dest << ":\n\n";
@@ -691,27 +505,21 @@ void main_count_paths() {
     path_ans = 0;
     dfs_count_paths(src, dest, visited, {});
     for (deque <string> path : paths_count) {
-        for (string node : path) {
-            cout << node << " -> ";
-        }
+        for (string node : path) { cout << node << " -> "; }
         cout << dest << '\n';
     }
     cout << "\nTotal count: " << path_ans << " paths\n";
 }
 void main_count_vertices() {
     cout << "\n\nList of All Vertices:\n";
-    for (string a : all_vertices) {
-        cout << a << ' ';
-    }
+    for (string a : all_vertices) { cout << a << ' '; }
     cout << "\nCurrent total vertex count (order): " << all_vertices.size() << '\n';
 }
 void main_count_edges() {
     cout << "\n\nList of All Edges:\n";
     for (pair <string, string> x : all_edges) {
         cout << "  Nodes: { " << x.first << ' ' << x.second << " }";
-        if (weighted) {
-            cout << ", Weight: " << all_weights[make_pair(x.first, x.second)] << '\n';
-        }
+        if (weighted) { cout << ", Weight: " << all_weights[make_pair(x.first, x.second)] << '\n'; }
     }
     cout << "\nCurrent total edge count (size): " << all_edges.size() << '\n';
 }
@@ -722,9 +530,7 @@ void main_count_neighbors() {
         getline(cin, temp);
         if (all_vertices.find(temp) != all_vertices.end()) {
             cout << "List of All Neighbors of Node " << temp << ":\n";
-            for (string x : all_graph[temp]) {
-                cout << x << ' '; 
-            }
+            for (string x : all_graph[temp]) { cout << x << ' '; }
             cout << "\nCurrent total neighbor count (degree): " << all_graph[temp].size() << '\n';
             break;
         }
@@ -742,10 +548,7 @@ void main_count_degree() {
     int count_degree = 0;
     cout << "\nList of All Vertices of Degree " << temp << ":\n";
     for (string x : all_vertices) {
-        if (all_graph[x].size() == stoi(temp)) {
-            cout << x << ' ';
-            count_degree++;
-        }
+        if (all_graph[x].size() == stoi(temp)) { cout << x << ' '; count_degree++; }
     }
     cout << "\nCount of all vertices of degree " << temp << ": " << count_degree << '\n';
 }
@@ -780,12 +583,7 @@ void main_count_root_depth() {
         }
     }
     cout << "\nList of All Vertices of Depth " << target << " from Root " << root << ":\n";
-    for (string x : all_vertices) {
-        if (depth[x] == stoi(target)) {
-            count_depth++;
-            cout << x << ' ';
-        }
-    }
+    for (string x : all_vertices) { if (depth[x] == stoi(target)) { count_depth++; cout << x << ' '; } }
     cout << "\nCount of all vertices of depth " << target << " from root " << root << ": " << count_depth << '\n';
 }
 
@@ -807,10 +605,7 @@ void main_dijkstra() {
     const int INF = 1e9;
     map <string, int> dist;
     map <string, string> parent;
-    for (string x : all_vertices) {
-        dist[x] = INF;
-        parent[x] = "";
-    }
+    for (string x : all_vertices) { dist[x] = INF, parent[x] = ""; }
     dist[start] = 0, parent[start] = "";
     priority_queue<pair <int, string>, vector<pair <int, string>>, greater<pair <int, string>>> pq;
     pq.push({0, start});
@@ -843,9 +638,7 @@ void main_dijkstra() {
             cur = parent.at(cur);
         }
         reverse(path.begin(), path.end());
-        for (int i = 0; i < path.size() - 1; ++i) {
-            cout << path[i] << " -(" << all_weights[make_pair(path[i], path[i + 1])] << ")-> ";
-        }
+        for (int i = 0; i < path.size() - 1; ++i) { cout << path[i] << " -(" << all_weights[make_pair(path[i], path[i + 1])] << ")-> "; }
         cout << x << '\n';
     }
     if (!weighted) { all_weights.clear(); }
@@ -911,9 +704,7 @@ void main_bellman_ford() {
                 cur = parent.at(cur);
             }
             reverse(path.begin(), path.end());
-            for (int i = 0; i < path.size() - 1; ++i) {
-                cout << path[i] << " -(" << all_weights[make_pair(path[i], path[i + 1])] << ")-> ";
-            }
+            for (int i = 0; i < path.size() - 1; ++i) { cout << path[i] << " -(" << all_weights[make_pair(path[i], path[i + 1])] << ")-> "; }
             cout << x << '\n';
         }
     }
@@ -937,7 +728,6 @@ void main_floyd_warshall() {
     const int INF = 1e9;
     map <pair <string, string>, int> dist;
     map <pair <string, string>, string> next;
-
     for (string u : all_vertices) {
         for (string v : all_vertices) {
             dist[{u, v}] = (u == v ? 0 : INF);
@@ -1137,3 +927,4 @@ int main() {
     }
     return 0;
 }
+
